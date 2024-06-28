@@ -174,14 +174,21 @@ class RelationshipExtractor(BaseExtractor):
         """Extract compound-gene relationships from CTD_chem_gene_ixns.csv"""
         default_extracted_columns = ["ChemicalID", "GeneID"]
         renamed_columns = ["source_id", "target_id"]
-
         df = df.with_columns(pl.col("GeneID").apply(lambda x: "ENTREZ:" + x))
         df = df.with_columns(pl.col("ChemicalID").apply(lambda x: "MESH:" + x))
-        new_df = df.with_columns(
-            pl.col("InteractionActions").apply(lambda x: f"CTD::{x}" if x else "CTD::IS_ASSOCIATED_WITH")
-        )
-        label = new_df["InteractionActions"].to_numpy()
         
+        new_df = df.with_columns([
+        	pl.col("InteractionActions").str.split("|").alias("InteractionActions")
+        ]).explode("InteractionActions")
+
+        new_df = new_df.with_columns(
+            pl.col("InteractionActions").map_elements(lambda x: f"CTD::{x}" if x else "CTD::IS_ASSOCIATED_WITH")
+        )
+        
+        label = new_df["InteractionActions"].to_numpy()
+
+        df = new_df.drop("InteractionActions")
+
         return self._extract_relationship(
             df, default_extracted_columns, renamed_columns, label
         )
@@ -191,8 +198,10 @@ class RelationshipExtractor(BaseExtractor):
         default_extracted_columns = ["ChemicalID", "DiseaseID"]
         renamed_columns = ["source_id", "target_id"]
         df = df.with_columns(pl.col("ChemicalID").apply(lambda x: "MESH:" + x))
+        
         new_df = df.with_columns(
-            pl.col("DirectEvidence").apply(lambda x: f"CTD::{x}" if x else "CTD::IS_ASSOCIATED_WITH", skip_nulls=False)
+            pl.col("DirectEvidence")
+            .map_elements(lambda x: f"CTD::{x}" if x else "CTD::IS_ASSOCIATED_WITH", skip_nulls=False)
         )
         label = new_df["DirectEvidence"].to_numpy()
         
@@ -204,7 +213,7 @@ class RelationshipExtractor(BaseExtractor):
         """Extract compound-pathway relationships from CTD_chem_pathways_enriched.csv"""
         default_extracted_columns = ["ChemicalID", "PathwayID"]
         renamed_columns = ["source_id", "target_id"]
-        df = df.with_columns(pl.col("ChemicalID").apply(lambda x: "MESH:" + x))
+        df = df.with_columns(pl.col("ChemicalID").map_elements(lambda x: "MESH:" + x))
         label = "CTD::IS_ASSOCIATED_WITH"
 
         return self._extract_relationship(
