@@ -106,13 +106,13 @@ def check_relation_type(key: str, relation_types: list):
         relation_type = str(relation_type)
 
         if not re.match(
-            r"^[a-zA-Z0-9_]+::[a-zA-Z0-9_\+\- ><]+::[a-zA-Z0-9_]+:[a-zA-Z0-9_]+$",
+            r"^[a-zA-Z0-9_]+::[a-zA-Z0-9_\+\- ><\^]+::[a-zA-Z0-9_]+:[a-zA-Z0-9_]+$",
             relation_type,
         ):
             errors.append(relation_type)
 
     if len(errors) > 0:
-        error_msg = "The {key} should be in the format of 'namespace::relation_type::source_entity_type:target_entity_type', but got the following relation types: {errors}.".format(
+        error_msg = "The {key} should be in the format of '^[a-zA-Z0-9_]+::[a-zA-Z0-9_\\+\\- ><\\^]+::[a-zA-Z0-9_]+:[a-zA-Z0-9_]+$', but got the following relation types: {errors}.".format(
             key=key, errors=errors
         )
     else:

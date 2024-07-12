@@ -45,7 +45,7 @@ class BaseExtractor:
             has_header=False,
             infer_schema_length=0,
             new_columns=headers,
-            comment_char="#",
+            comment_prefix="#",
             separator="\t",
         )
 
