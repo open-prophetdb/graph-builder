@@ -113,7 +113,7 @@ def check_relation_type(key: str, relation_types: list):
             errors.append(relation_type)
 
     if len(errors) > 0:
-        error_msg = "The {key} should be in the format of '^[a-zA-Z0-9_]+::[a-zA-Z0-9_+\-!@#$%^&*()=><~`{}[\]|\\\/?.;,]+::[a-zA-Z0-9_]+:[a-zA-Z0-9_]+$', but got the following relation types: {errors}.".format(
+        error_msg = "The {key} should be in the format of '[database_name]::[relation_type]::[head_entity_id]:[tail_entity_id]', but got the following relation types: {errors}.".format(
             key=key, errors=errors
         )
     else:
