@@ -106,13 +106,14 @@ def check_relation_type(key: str, relation_types: list):
         relation_type = str(relation_type)
 
         if not re.match(
-            r"^[a-zA-Z0-9_]+::[a-zA-Z0-9_\+\- ><\^]+::[a-zA-Z0-9_]+:[a-zA-Z0-9_]+$",
+            r"^[a-zA-Z0-9_]+::[a-zA-Z0-9_+\-!@#$%^&*()=><~`{}[\]|\\\/?.;,]+::[a-zA-Z0-9_]+:[a-zA-Z0-9_]+$",
+            # r"^[a-zA-Z0-9_]+::[a-zA-Z0-9_\+\- ><\^]+::[a-zA-Z0-9_]+:[a-zA-Z0-9_]+$",
             relation_type,
         ):
             errors.append(relation_type)
 
     if len(errors) > 0:
-        error_msg = "The {key} should be in the format of '^[a-zA-Z0-9_]+::[a-zA-Z0-9_\\+\\- ><\\^]+::[a-zA-Z0-9_]+:[a-zA-Z0-9_]+$', but got the following relation types: {errors}.".format(
+        error_msg = "The {key} should be in the format of '^[a-zA-Z0-9_]+::[a-zA-Z0-9_+\-!@#$%^&*()=><~`{}[\]|\\\/?.;,]+::[a-zA-Z0-9_]+:[a-zA-Z0-9_]+$', but got the following relation types: {errors}.".format(
             key=key, errors=errors
         )
     else:
@@ -507,8 +508,12 @@ class BaseParser:
             )
 
             if df["formatted_relation_type"].isnull().any():
+                invalid_relation_types = df[
+                    df["formatted_relation_type"].isnull()
+                ]["relation_type"].unique()
+
                 raise ValueError(
-                    "The formatted_relation_type column contains NaN, please check the relation type dictionary, or you can skip to replace the relation type with the formatted relation type."
+                    f"Cannot find the formatted relation type for some relation types ({invalid_relation_types}). please check the relation type dictionary, or you can skip to replace the relation type with the formatted relation type."
                 )
         else:
             logger.info(
