@@ -322,12 +322,12 @@ class CtdParser(BaseParser):
     def __init__(
         self,
         reference_entity_file: Path,
-        db_directory: Path,
         output_directory: Path,
         download=True,
         skip=True,
         num_workers: int = 20,
-        relation_type_dict_df=None,
+        relation_type_dict_df: pd.DataFrame | None = None,
+        db_directory: Path | None = None,
     ):
         chem_gene = Download(
             download_url="http://ctdbase.org/reports/CTD_chem_gene_ixns.tsv.gz",
@@ -457,8 +457,8 @@ if __name__ == "__main__":
 
     parser = CtdParser(
         Path("/Volumes/ProjectData/Current/Datasets/biomedgps/graph_data/entities.tsv"),
-        Path("/Users/jy006/Downloads/Development/biomedgps/ctd"),
         Path("/Users/jy006/Downloads/Development/biomedgps_output/ctd"),
+        db_directory=Path("/Users/jy006/Downloads/Development/biomedgps/ctd"),
     )
 
     parser.parse()

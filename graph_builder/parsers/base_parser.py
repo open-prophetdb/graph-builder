@@ -100,7 +100,7 @@ class Relation:
         return ret
 
 
-def check_relation_type(key: str, relation_types: list):
+def check_relation_types(key: str, relation_types: list) -> str:
     errors = []
     for relation_type in list(set(relation_types)):
         relation_type = str(relation_type)
@@ -121,18 +121,49 @@ def check_relation_type(key: str, relation_types: list):
 
     return error_msg
 
+def is_biomedgps_format(df: pd.DataFrame) -> bool:
+    expected_columns = [
+        "source_id",
+        "source_type",
+        "target_id",
+        "target_type",
+        "relation_type",
+        "resource",
+        "key_sentence",
+    ]
+
+    return all([x in df.columns for x in expected_columns])
+
+def check_entity_ids(entity_ids: List[str]) -> str:
+    expected_regex = re.compile(r"^[A-Za-z]+:[0-9a-zA-Z]+$")
+
+    errors = []
+    for entity_id in entity_ids:
+        if not expected_regex.match(entity_id):
+            errors.append(entity_id)
+
+    if len(errors) > 0:
+        error_msg = "The entity ids should be in the format of 'resource:entity_id', such as MESH:D000111, but got the following entity ids: {errors}.".format(
+            errors=errors
+        )
+    else:
+        error_msg = ""
+
+    return error_msg
+
 
 class BaseParser:
     def __init__(
         self,
         reference_entity_file: Path,
-        db_directory: Path,
+        db_directory: Path | None,
         output_directory: Path,
         config: BaseConfig | None = None,
         download=True,
         skip=True,
         num_workers: int = 20,
         relation_type_dict_df: pd.DataFrame | None = None,
+        relation_file: Path | None = None,
     ):
         if config is None:
             raise ValueError("config is required, you need to specify it in subclass.")
@@ -141,9 +172,15 @@ class BaseParser:
         if not os.path.exists(self.output_directory):
             os.makedirs(self.output_directory)
 
-        self.db_directory = db_directory.joinpath(config.database)
-        if not os.path.exists(self.db_directory):
-            os.makedirs(self.db_directory)
+        if relation_file is None and db_directory is None:
+            raise ValueError(
+                "If the database file needs to be downloaded, the db_directory should be provided. Or you need to provide a custom relation file."
+            )
+
+        if db_directory is not None:
+            self.db_directory = db_directory.joinpath(config.database)
+            if not os.path.exists(self.db_directory):
+                os.makedirs(self.db_directory)
 
         self.config = config
         self.download = download
@@ -178,7 +215,8 @@ class BaseParser:
             if len(failed_downloads) > 0:
                 sys.exit(1)
 
-        self.entities = self._read_reference_entity_file(reference_entity_file)
+        self._entities = self._read_reference_entity_file(reference_entity_file)
+        self._relation_file = relation_file
 
         # For compatibility with the previous version
         # In future, we will remove the "SideEffect" label from the entities file and treat the side effect as a relation type between drugs and diseases.
@@ -189,6 +227,16 @@ class BaseParser:
 
         self.num_workers = num_workers
         self.relation_type_dict_df = relation_type_dict_df
+
+    @property
+    def relation_file(self) -> Path | None:
+        """Returns the relation file, if it is provided. If the database file needs to be downloaded, the relation file should be None."""
+        return self._relation_file
+
+    @property
+    def entities(self) -> pd.DataFrame:
+        """Returns the reference entities dataframe."""
+        return self._entities
 
     @property
     def raw_filepaths(self) -> List[Path]:
@@ -523,12 +571,12 @@ class BaseParser:
 
         # Check the relation type and formatted relation type
         relation_types = df["relation_type"].tolist()
-        error_msg = check_relation_type("relation_type", relation_types)
+        error_msg = check_relation_types("relation_type", relation_types)
         if error_msg:
             raise ValueError(error_msg)
 
         formatted_relation_types = df["formatted_relation_type"].tolist()
-        error_msg = check_relation_type("formatted_relation_type", formatted_relation_types)
+        error_msg = check_relation_types("formatted_relation_type", formatted_relation_types)
         if error_msg:
             raise ValueError(error_msg)
 

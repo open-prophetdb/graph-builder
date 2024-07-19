@@ -1,4 +1,4 @@
-import re
+import os
 import logging
 import coloredlogs
 import verboselogs
@@ -12,14 +12,15 @@ logger = logging.getLogger("graph_builder.cli")
 
 
 def _parse_database(
-    entity_file,
-    db_dir,
-    output_dir,
-    database,
-    download=True,
-    skip=True,
-    num_workers=20,
-    relation_type_dict_fpath=None,
+    entity_file: Path,
+    output_dir: Path,
+    database: str,
+    download: bool = True,
+    skip: bool = True,
+    num_workers: int = 20,
+    relation_type_dict_fpath: str | None = None,
+    db_dir: Path | None = None,
+    relation_file: Path | None = None,
 ):
     Parser = parser_map.get(database, None)
     if Parser:
@@ -55,6 +56,7 @@ def _parse_database(
             skip=skip,
             num_workers=num_workers,
             relation_type_dict_df=relation_type_dict_df,
+            relation_file=relation_file,
         )
         parsed_results = parser.parse()
     else:
@@ -69,10 +71,11 @@ class NotSupportedAction(Exception):
 
 @click.command(help="Parse databases and make the related graph files.")
 @click.option(
-    "--db-dir",
+    "--db-file-or-dir",
     "-d",
     required=True,
-    help="The directory which saved the downloaded database files.",
+    type=click.Path(exists=True),
+    help="If it's a directory, it will be saved the downloaded database files. Otherwise, it will be used as a custom database file in the BioMedGPS format. In this case, you should specify the --database customdb option.",
 )
 @click.option(
     "--output-dir",
@@ -117,7 +120,7 @@ class NotSupportedAction(Exception):
 )
 def cli(
     output_dir,
-    db_dir,
+    db_file_or_dir,
     database,
     ontology_file,
     download,
@@ -151,20 +154,21 @@ def cli(
             invalid_databases,
         )
     logger.info(
-        "Run jobs with (output_dir: %s, db_dir: %s, databases: %s, download: %s, skip: %s)"
-        % (output_dir, db_dir, all_databases, download, skip)
+        "Run jobs with (output_dir: %s, db file/directory: %s, databases: %s, download: %s, skip: %s)"
+        % (output_dir, db_file_or_dir, all_databases, download, skip)
     )
 
     Parallel(n_jobs=1)(
         delayed(_parse_database)(
             entity_file=Path(ontology_file),
-            db_dir=Path(db_dir),
+            db_dir=Path(db_file_or_dir) if os.path.isdir(db_file_or_dir) else None,
             output_dir=Path(output_dir),
             database=db,
             download=download,
             skip=skip,
             num_workers=n_jobs,
             relation_type_dict_fpath=relation_type_dict_fpath,
+            relation_file=db_file_or_dir if os.path.isfile(db_file_or_dir) else None,
         )
         for db in valid_databases
     )

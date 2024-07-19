@@ -23,11 +23,12 @@ Usage: graph-builder [OPTIONS]
   Parse databases and make the related graph files.
 
 Options:
-  -d, --db-dir TEXT               The directory which saved the downloaded
-                                  database files.  [required]
+  -d, --db-file-or-dir TEXT       If it's a directory, it will be saved the downloaded database files. 
+                                  Otherwise, it will be used as a custom database file in the BioMedGPS format. 
+                                  In this case, you should specify the --database customdb option.
   -o, --output-dir TEXT           The directory which saved the graph files.
                                   [required]
-  --database [drkg|ctd|hsdn|primekg]
+  --database [drkg|ctd|hsdn|primekg|customdb]
                                   Which databases (you can specify the
                                   --database argument multiple times)?
                                   [required]
