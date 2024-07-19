@@ -106,7 +106,7 @@ def check_relation_types(key: str, relation_types: list) -> str:
         relation_type = str(relation_type)
 
         if not re.match(
-            r"^[a-zA-Z0-9_]+::[a-zA-Z0-9_+\-!@#$%^&*()=><~`{}[\]|\\\/?.;,]+::[a-zA-Z0-9_]+:[a-zA-Z0-9_]+$",
+            r"^[a-zA-Z0-9_]+::[a-zA-Z0-9_+\-!@#$%^&*()=><~`{}[\]|\\\/?.;, ]+::[a-zA-Z0-9_]+:[a-zA-Z0-9_]+$",
             # r"^[a-zA-Z0-9_]+::[a-zA-Z0-9_\+\- ><\^]+::[a-zA-Z0-9_]+:[a-zA-Z0-9_]+$",
             relation_type,
         ):
