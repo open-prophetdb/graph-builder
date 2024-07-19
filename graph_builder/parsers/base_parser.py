@@ -135,7 +135,7 @@ def is_biomedgps_format(df: pd.DataFrame) -> bool:
     return all([x in df.columns for x in expected_columns])
 
 def check_entity_ids(entity_ids: List[str]) -> str:
-    expected_regex = re.compile(r"^[A-Za-z]+:[0-9a-zA-Z]+$")
+    expected_regex = re.compile(r"^[a-zA-Z\-]+:[a-zA-Z0-9\-_]+$")
 
     errors = []
     for entity_id in entity_ids:
