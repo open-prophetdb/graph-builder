@@ -16,10 +16,11 @@ class PrimeKGParser(BaseParser):
         reference_entity_file: Path,
         db_directory: Path,
         output_directory: Path,
-        download=True,
-        skip=True,
+        download: bool = True,
+        skip: bool = True,
         num_workers: int = 20,
-        relation_type_dict_df=None,
+        relation_type_dict_df: pd.DataFrame | None = None,
+        **kwargs,
     ):
         download_obj = Download(
             download_url="https://dataverse.harvard.edu/file.xhtml?fileId=6180620&version=2.1#",

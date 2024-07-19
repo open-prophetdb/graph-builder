@@ -16,11 +16,11 @@ class HsdnParser(BaseParser):
         reference_entity_file: Path,
         db_directory: Path,
         output_directory: Path,
-        download=True,
-        skip=True,
+        download: bool = True,
+        skip: bool = True,
         num_workers: int = 20,
-        relation_type_dict_df=None,
-        customdb_file: Path | None = None,
+        relation_type_dict_df: pd.DataFrame | None = None,
+        **kwargs,
     ):
         download_obj = Download(
             download_url="https://static-content.springer.com/esm/art%3A10.1038%2Fncomms5212/MediaObjects/41467_2014_BFncomms5212_MOESM1045_ESM.txt",

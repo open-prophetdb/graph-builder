@@ -328,6 +328,7 @@ class CtdParser(BaseParser):
         num_workers: int = 20,
         relation_type_dict_df: pd.DataFrame | None = None,
         db_directory: Path | None = None,
+        **kwargs,
     ):
         chem_gene = Download(
             download_url="http://ctdbase.org/reports/CTD_chem_gene_ixns.tsv.gz",

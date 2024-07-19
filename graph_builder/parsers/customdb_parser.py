@@ -21,10 +21,11 @@ class CustomdbParser(BaseParser):
         self,
         reference_entity_file: Path,
         output_directory: Path,
-        skip=True,
+        skip: bool = True,
         num_workers: int = 20,
         relation_type_dict_df: pd.DataFrame | None = None,
         relation_file: Path | None = None,
+        **kwargs,
     ):
         if relation_file is None:
             raise ValueError("The relation file is not provided, it's required for the CustomDB parser.")

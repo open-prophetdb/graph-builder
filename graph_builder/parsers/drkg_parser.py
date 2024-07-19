@@ -13,11 +13,12 @@ class DrkgParser(BaseParser):
         self,
         reference_entity_file: Path,
         output_directory: Path,
-        download=True,
-        skip=True,
+        download: bool = True,
+        skip: bool = True,
         num_workers: int = 20,
-        relation_type_dict_df=None,
+        relation_type_dict_df: pd.DataFrame | None = None,
         db_directory: Path | None = None,
+        **kwargs,
     ):
         download_obj = Download(
             download_url="https://dgl-data.s3-us-west-2.amazonaws.com/dataset/DRKG/drkg.tar.gz",
