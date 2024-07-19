@@ -5,6 +5,7 @@ import re
 from typing import List
 from graph_builder.parsers.base_parser import (
     BaseParser,
+    BaseConfig,
     Relation,
     check_relation_types,
     check_entity_ids,
@@ -30,11 +31,16 @@ class CustomdbParser(BaseParser):
         if relation_file is None:
             raise ValueError("The relation file is not provided, it's required for the CustomDB parser.")
 
+        config = BaseConfig(
+            downloads=[],
+            database="customdb",
+        )
+
         super().__init__(
             reference_entity_file,
             None,
             output_directory,
-            None,
+            config,
             False,
             skip,
             num_workers,
