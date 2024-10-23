@@ -58,7 +58,7 @@ class PrimeKGParser(BaseParser):
         elif raw_type == "drug":
             return "Compound"
         elif raw_type == "effect/phenotype":
-            return "Symptom"
+            return "Phenotype"
         elif raw_type == "molecular_function":
             return "MolecularFunction"
         elif raw_type == "pathway":
