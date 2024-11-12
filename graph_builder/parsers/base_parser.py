@@ -168,7 +168,9 @@ class BaseParser:
         if config is None:
             raise ValueError("config is required, you need to specify it in subclass.")
 
-        self.output_directory = output_directory.joinpath(config.database)
+        if config.database != "customdb":
+            self.output_directory = output_directory.joinpath(config.database)
+
         if not os.path.exists(self.output_directory):
             os.makedirs(self.output_directory)
 
