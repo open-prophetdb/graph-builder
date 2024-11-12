@@ -100,7 +100,7 @@ class Relation:
         return ret
 
 
-def check_relation_types(key: str, relation_types: list) -> str:
+def check_relation_types(key: str, relation_types: list, show_warning: bool = True) -> List[str]:
     errors = []
     for relation_type in list(set(relation_types)):
         relation_type = str(relation_type)
@@ -112,14 +112,12 @@ def check_relation_types(key: str, relation_types: list) -> str:
         ):
             errors.append(relation_type)
 
-    if len(errors) > 0:
-        error_msg = "The {key} should be in the format of '[database_name]::[relation_type]::[head_entity_id]:[tail_entity_id]', but got the following relation types: {errors}.".format(
+    if len(errors) > 0 and show_warning:
+        logger.warning("The {key} should be in the format of '[database_name]::[relation_type]::[head_entity_id]:[tail_entity_id]', but got the following relation types: {errors}.".format(
             key=key, errors=errors
-        )
-    else:
-        error_msg = ""
+        ))
 
-    return error_msg
+    return errors
 
 def is_biomedgps_format(df: pd.DataFrame) -> bool:
     expected_columns = [
@@ -136,22 +134,15 @@ def is_biomedgps_format(df: pd.DataFrame) -> bool:
 
     return all([x in df.columns for x in expected_columns])
 
-def check_entity_ids(entity_ids: List[str]) -> str:
-    expected_regex = re.compile(r"^[a-zA-Z\-]+:[a-zA-Z0-9\-_]+$")
+def check_entity_ids(entity_ids: List[str]) -> List[str]:
+    expected_regex = re.compile(r"^[a-zA-Z\-0-9_]+:[a-zA-Z0-9\-_\.]+$")
 
     errors = []
     for entity_id in entity_ids:
         if not expected_regex.match(entity_id):
             errors.append(entity_id)
 
-    if len(errors) > 0:
-        error_msg = "The entity ids should be in the format of 'resource:entity_id', such as MESH:D000111, but got the following entity ids: {errors}.".format(
-            errors=errors
-        )
-    else:
-        error_msg = ""
-
-    return error_msg
+    return errors
 
 
 class BaseParser:
@@ -822,6 +813,8 @@ class BaseParser:
             deduped_entity_type_id = list(
                 set(deduped_source_entity_type_id + deduped_target_entity_type_id)
             )
+
+            logger.info("The number of deduped entity type ids: %s" % len(deduped_entity_type_id))
 
             # Create argument tuples for each call of get_matched_entity_id
             args = [(i, entity_type_ids) for i in deduped_entity_type_id]

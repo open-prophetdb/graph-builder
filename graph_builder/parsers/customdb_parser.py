@@ -63,15 +63,20 @@ class CustomdbParser(BaseParser):
 
         errors = check_entity_ids(df["source_id"].to_list())
         if len(errors) > 0:
-            raise ValueError(f"The source_id column contains invalid ids. {errors}")
+            # raise ValueError(f"The source_id column contains invalid ids. {errors}")
+            # Filter out all the rows with invalid source_id
+            logger.warning(f"The source_id column contains invalid ids. {errors}")
+            df = df[~df["source_id"].isin(errors)]
 
         errors = check_entity_ids(df["target_id"].to_list())
         if len(errors) > 0:
-            raise ValueError(f"The target_id column contains invalid ids. {errors}")
+            logger.warning(f"The target_id column contains invalid ids. {errors}")
+            df = df[~df["target_id"].isin(errors)]
 
         errors = check_relation_types("relation_type", df["relation_type"].to_list())
         if len(errors) > 0:
-            raise ValueError(f"The relation_type column contains invalid relation types. {errors}")
+            logger.warning(f"The relation_type column contains invalid relation types. {errors}")
+            df = df[~df["relation_type"].isin(errors)]
 
         return df
 

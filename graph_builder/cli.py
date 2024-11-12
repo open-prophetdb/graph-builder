@@ -114,7 +114,7 @@ class NotSupportedAction(Exception):
 @click.option(
     "--skip/--no-skip", default=True, help="Whether skip the existing file(s)?"
 )
-@click.option("--log-file", "-l", required=False, help="The log file.")
+@click.option("--log-file", "-l", required=False, help="The log file.", type=click.Path(file_okay=True, dir_okay=False))
 @click.option(
     "--debug/--no-debug", default=False, help="Whether enable the debug mode?"
 )
@@ -132,6 +132,9 @@ def cli(
 ):
     fmt = "%(asctime)s - %(module)s:%(lineno)d - %(levelname)s - %(message)s"
     if log_file:
+        log_dir = Path(log_file).parent
+        if not log_dir.exists():
+            log_dir.mkdir(parents=True, exist_ok=True)
         fh = logging.FileHandler(log_file)
         fh.setFormatter(logging.Formatter(fmt))
         logging.getLogger().addHandler(fh)
