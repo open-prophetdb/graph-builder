@@ -129,7 +129,9 @@ def is_biomedgps_format(df: pd.DataFrame) -> bool:
         "target_type",
         "relation_type",
         "resource",
-        "key_sentence",
+        # The following columns seem not to be necessary for the graph builder
+        # "key_sentence",
+        # "pmids",
     ]
 
     return all([x in df.columns for x in expected_columns])
@@ -170,6 +172,8 @@ class BaseParser:
 
         if config.database != "customdb":
             self.output_directory = output_directory.joinpath(config.database)
+        else:
+            self.output_directory = output_directory
 
         if not os.path.exists(self.output_directory):
             os.makedirs(self.output_directory)

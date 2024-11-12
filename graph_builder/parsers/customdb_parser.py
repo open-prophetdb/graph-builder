@@ -89,6 +89,13 @@ class CustomdbParser(BaseParser):
         relations = self.read_customdb(self.relation_file)
         logger.info("Get %d relations" % len(relations))
 
+        # These relations might be lacking key_sentence or pmids columns, so we need to add them if they are missing.
+        if "key_sentence" not in relations.columns:
+            relations["key_sentence"] = ""
+
+        if "pmids" not in relations.columns:
+            relations["pmids"] = ""
+
         return [Relation.from_args(**row) for row in relations.to_dict(orient="records")]  # type: ignore
 
 
