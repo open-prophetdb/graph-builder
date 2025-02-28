@@ -7,6 +7,7 @@ import pandas as pd
 from pathlib import Path
 from graph_builder.parsers import parser_map
 from joblib import Parallel, delayed
+from typing import Literal
 
 logger = logging.getLogger("graph_builder.cli")
 
@@ -19,6 +20,7 @@ def _parse_database(
     skip: bool = True,
     num_workers: int = 20,
     relation_type_dict_fpath: str | None = None,
+    allow_ignore_checking_errors: Literal['relation_type', 'formatted_relation_type', 'all'] = 'all',
     db_dir: Path | None = None,
     relation_file: Path | None = None,
 ):
@@ -56,6 +58,7 @@ def _parse_database(
             skip=skip,
             num_workers=num_workers,
             relation_type_dict_df=relation_type_dict_df,
+            allow_ignore_checking_errors=allow_ignore_checking_errors,
             relation_file=relation_file,
         )
         parsed_results = parser.parse()
@@ -112,6 +115,14 @@ class NotSupportedAction(Exception):
     type=click.Path(exists=True, file_okay=True, dir_okay=False),
 )
 @click.option(
+    "--allow-ignore-checking-errors",
+    "-a",
+    required=False,
+    type=click.Choice(['relation_type', 'formatted_relation_type', 'all']),
+    help="Which errors to ignore? (relation_type, formatted_relation_type, all)",
+    default='all',
+)
+@click.option(
     "--skip/--no-skip", default=True, help="Whether skip the existing file(s)?"
 )
 @click.option("--log-file", "-l", required=False, help="The log file.", type=click.Path(file_okay=True, dir_okay=False))
@@ -129,6 +140,7 @@ def cli(
     log_file,
     debug,
     relation_type_dict_fpath,
+    allow_ignore_checking_errors,
 ):
     fmt = "%(asctime)s - %(module)s:%(lineno)d - %(levelname)s - %(message)s"
     if log_file:
@@ -172,6 +184,7 @@ def cli(
             num_workers=n_jobs,
             relation_type_dict_fpath=relation_type_dict_fpath,
             relation_file=db_file_or_dir if os.path.isfile(db_file_or_dir) else None,
+            allow_ignore_checking_errors=allow_ignore_checking_errors,
         )
         for db in valid_databases
     )

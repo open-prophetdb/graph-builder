@@ -112,6 +112,11 @@ class HsdnParser(BaseParser):
         return df
 
     def format_df(self, df: pd.DataFrame, mesh: pd.DataFrame) -> pd.DataFrame:
+        label = "Symptom"
+        if "Symptom" not in self.entities["label"]:
+            logger.warning("No Symptom label in the entity file, so we try to use Phenotype as the symptom type.")
+            label = "Phenotype"
+
         diseases = list(set(df["disease"]))
         disease_id_map = {
             x: self.get_value(mesh[mesh["name"] == x], "id") for x in diseases
@@ -124,7 +129,7 @@ class HsdnParser(BaseParser):
 
         logger.info("Get id for %d symptoms" % len(symptom_id_map.keys()))
         df["target_id"] = list(map(lambda x: symptom_id_map[x], df["symptom"]))
-        df["target_type"] = "Symptom"
+        df["target_type"] = label
         df["target_name"] = df["symptom"]
 
         logger.info("Get id for %d diseases" % len(disease_id_map.keys()))
@@ -132,7 +137,7 @@ class HsdnParser(BaseParser):
         df["source_type"] = "Disease"
         df["source_name"] = df["disease"]
 
-        df["relation_type"] = "HSDN::has_symptom::Disease:Symptom"
+        df["relation_type"] = f"HSDN::has_symptom::Disease:{label}"
         df["resource"] = "HSDN"
         df["key_sentence"] = ""
         df["pmids"] = ""

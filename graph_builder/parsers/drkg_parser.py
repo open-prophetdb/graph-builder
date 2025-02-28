@@ -192,6 +192,10 @@ class DrkgParser(BaseParser):
             ]
         ]
 
+        if "Symptom" not in self.entities["label"]:
+            logger.warning("No Symptom label in the entity file, so we try to use Phenotype as the symptom type.")
+            drkg["target_type"] = drkg["target_type"].apply(lambda x: "Phenotype" if x == "Symptom" else x)
+
         return [Relation.from_args(**row) for row in drkg.to_dict(orient="records")]  # type: ignore
 
 

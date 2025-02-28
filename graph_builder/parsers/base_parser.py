@@ -11,7 +11,7 @@ import requests
 import logging
 from pathlib import Path
 from multiprocessing import Pool
-from typing import Type, List, Tuple, Optional
+from typing import Type, List, Tuple, Optional, Literal
 from dataclasses import dataclass
 
 
@@ -156,6 +156,7 @@ class BaseParser:
         skip=True,
         num_workers: int = 20,
         relation_type_dict_df: pd.DataFrame | None = None,
+        allow_ignore_checking_errors: Literal['relation_type', 'formatted_relation_type', 'all'] = 'all',
         relation_file: Path | None = None,
     ):
         if config is None:
@@ -224,6 +225,7 @@ class BaseParser:
 
         self.num_workers = num_workers
         self.relation_type_dict_df = relation_type_dict_df
+        self.allow_ignore_checking_errors = allow_ignore_checking_errors if allow_ignore_checking_errors is not None else 'all'
 
     @property
     def relation_file(self) -> Path | None:
@@ -569,12 +571,12 @@ class BaseParser:
         # Check the relation type and formatted relation type
         relation_types = df["relation_type"].tolist()
         error_msg = check_relation_types("relation_type", relation_types)
-        if error_msg:
+        if error_msg and (self.allow_ignore_checking_errors == "formatted_relation_type" or self.allow_ignore_checking_errors == "all"):
             raise ValueError(error_msg)
 
         formatted_relation_types = df["formatted_relation_type"].tolist()
         error_msg = check_relation_types("formatted_relation_type", formatted_relation_types)
-        if error_msg:
+        if error_msg and (self.allow_ignore_checking_errors == "relation_type" or self.allow_ignore_checking_errors == "all"):
             raise ValueError(error_msg)
 
         def check_and_swap(row):
