@@ -39,6 +39,7 @@ class DrkgParser(BaseParser):
             skip,
             num_workers,
             relation_type_dict_df,
+            **kwargs,
         )
 
     def _extract_tar_gz(self, filepath: Path):

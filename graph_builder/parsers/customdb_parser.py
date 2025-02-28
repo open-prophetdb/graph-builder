@@ -46,6 +46,7 @@ class CustomdbParser(BaseParser):
             num_workers,
             relation_type_dict_df,
             relation_file=relation_file,
+            **kwargs,
         )
 
     def read_customdb(self, customdb_filepath: Path) -> pd.DataFrame:

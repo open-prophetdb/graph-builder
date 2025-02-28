@@ -226,6 +226,7 @@ class BaseParser:
         self.num_workers = num_workers
         self.relation_type_dict_df = relation_type_dict_df
         self.allow_ignore_checking_errors = allow_ignore_checking_errors if allow_ignore_checking_errors is not None else 'all'
+        logger.info(f"Using allow_ignore_checking_errors={self.allow_ignore_checking_errors} to ignore the checking errors.")
 
     @property
     def relation_file(self) -> Path | None:

@@ -42,6 +42,7 @@ class PrimeKGParser(BaseParser):
             skip,
             num_workers,
             relation_type_dict_df,
+            **kwargs,
         )
 
     def format_entity_type(self, raw_type: str) -> str:

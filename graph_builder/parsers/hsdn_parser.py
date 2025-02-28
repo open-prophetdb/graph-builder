@@ -46,6 +46,7 @@ class HsdnParser(BaseParser):
             skip,
             num_workers,
             relation_type_dict_df,
+            **kwargs,
         )
 
     def read_hsdn(self, hsdn_filepath: Path) -> pd.DataFrame:

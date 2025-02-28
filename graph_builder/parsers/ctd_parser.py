@@ -411,6 +411,7 @@ class CtdParser(BaseParser):
             skip,
             num_workers,
             relation_type_dict_df,
+            **kwargs,
         )
 
     def extract_relations(self) -> List[Relation]:
