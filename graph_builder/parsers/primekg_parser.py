@@ -23,7 +23,7 @@ class PrimeKGParser(BaseParser):
         **kwargs,
     ):
         download_obj = Download(
-            download_url="https://dataverse.harvard.edu/file.xhtml?fileId=6180620&version=2.1#",
+            download_url="https://dataverse.harvard.edu/api/access/datafile/7144484",
             filename="kg.csv",
             is_downloadable=False,
         )
