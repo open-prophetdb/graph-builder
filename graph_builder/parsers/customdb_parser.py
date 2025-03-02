@@ -36,6 +36,12 @@ class CustomdbParser(BaseParser):
             database="customdb",
         )
 
+        if "db_directory" in kwargs:
+            del kwargs["db_directory"]
+
+        if "download" in kwargs:
+            del kwargs["download"]
+
         super().__init__(
             reference_entity_file,
             None,
