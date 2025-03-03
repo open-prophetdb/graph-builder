@@ -25,7 +25,7 @@ class PrimeKGParser(BaseParser):
         download_obj = Download(
             download_url="https://dataverse.harvard.edu/api/access/datafile/7144484",
             filename="kg.csv",
-            is_downloadable=False,
+            is_downloadable=True,
         )
 
         config = BaseConfig(
